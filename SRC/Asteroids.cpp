@@ -10,6 +10,7 @@
 #include "BoundingShape.h"
 #include "BoundingSphere.h"
 #include "GUILabel.h"
+#include "Explosion.h"
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
@@ -45,6 +46,14 @@ void Asteroids::Start()
 
 	// Add this class as a listener of the score keeper
 	mScoreKeeper.AddListener(thisPtr);
+
+	// Create ambient light to show sprite textures
+	CreateAmbientLight();
+
+	// Create explosion texture
+	Animation* explosion_anim
+		= AnimationManager::GetInstance().CreateAnimationFromFile("explosion",
+			64, 1024, 64, 64, "explosion_fs.png");
 
 	// Create a spaceship and add it to the world
 	mGameWorld->AddObject(CreateSpaceship());
@@ -122,6 +131,15 @@ void Asteroids::OnSpecialKeyReleased(int key, int x, int y)
 
 void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 {
+	// Check if Asteroid has been removed
+	if (object->GetType() == GameObjectType("Asteroid"))
+	{
+		// Add explosion to asteroid position
+		shared_ptr<GameObject> explosion = CreateExplosion();
+		explosion->SetPosition(object->GetPosition());
+		explosion->SetRotation(object->GetRotation());
+		mGameWorld->AddObject(explosion);
+	}
 }
 
 // PUBLIC INSTANCE METHODS IMPLEMENTING ITimerListener ////////////////////////
@@ -195,6 +213,28 @@ void Asteroids::CreateGUI()
 	mGameDisplay->GetContainer()->AddComponent(lives_component, GLVector2f(0.0f, 0.0f));
 }
 
+shared_ptr<GameObject> Asteroids::CreateExplosion()
+{
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("explosion");
+	shared_ptr<Sprite> explosion_sprite =
+		make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+	explosion_sprite->SetLoopAnimation(false);
+	shared_ptr<GameObject> explosion = make_shared<Explosion>();
+	explosion->SetSprite(explosion_sprite);
+	explosion->Reset();
+	return explosion;
+}
+
+void Asteroids::CreateAmbientLight()
+{
+	// Create an ambient light to show sprite textures
+	GLfloat ambient_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	GLfloat diffuse_light[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light);
+	glEnable(GL_LIGHT0);
+}
+
 void Asteroids::OnScoreChanged(int score)
 {
 	// Format the score message using an string-based stream
@@ -207,6 +247,11 @@ void Asteroids::OnScoreChanged(int score)
 
 void Asteroids::OnPlayerKilled(int lives_left)
 {
+	// Add explosion to player position
+	shared_ptr<GameObject> explosion = CreateExplosion();
+	explosion->SetPosition(mSpaceship->GetPosition());
+	explosion->SetRotation(mSpaceship->GetRotation());
+	mGameWorld->AddObject(explosion);
 	// Format the lives left message using an string-based stream
 	std::ostringstream msg_stream;
 	msg_stream << "Lives: " << lives_left;
