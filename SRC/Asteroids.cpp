@@ -50,10 +50,18 @@ void Asteroids::Start()
 	// Create ambient light to show sprite textures
 	CreateAmbientLight();
 
-	// Create explosion texture
+	// Load explosion animation
 	Animation* explosion_anim
 		= AnimationManager::GetInstance().CreateAnimationFromFile("explosion",
 			64, 1024, 64, 64, "explosion_fs.png");
+	// Load asteroid animation
+	Animation* asteroid1_anim
+		= AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1",
+			128, 8192, 128, 128, "asteroid1_fs.png");
+	// Load spaceship animation
+	Animation* spaceship_anim
+		= AnimationManager::GetInstance().CreateAnimationFromFile("spaceship",
+			128, 128, 128, 128, "spaceship_fs.png");
 
 	// Create a spaceship and add it to the world
 	mGameWorld->AddObject(CreateSpaceship());
@@ -166,14 +174,17 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 	// Create a raw pointer to a spaceship that can be converted to
 	// shared_ptrs of different types because GameWorld implements IRefCount
 	mSpaceship = make_shared<Spaceship>();
+	// Add spaceship collision shape
 	mSpaceship->SetBoundingShape(make_shared<BoundingSphere>(mSpaceship->GetThisPtr(), 4.0f));
-	shared_ptr<Shape> spaceship_shape = make_shared<Shape>("spaceship.shape");
-	shared_ptr<Shape> thruster_shape = make_shared<Shape>("thruster.shape");
+	// Add bullet shape
 	shared_ptr<Shape> bullet_shape = make_shared<Shape>("bullet.shape");
-	mSpaceship->SetSpaceshipShape(spaceship_shape);
-	mSpaceship->SetThrusterShape(thruster_shape);
 	mSpaceship->SetBulletShape(bullet_shape);
-
+	// Add spaceship sprite animation
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("spaceship");
+	shared_ptr<Sprite> spaceship_sprite =
+		make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+	mSpaceship->SetSprite(spaceship_sprite);
+	mSpaceship->SetScale(0.1f);
 	// Reset spaceship back to centre of the world
 	mSpaceship->Reset();
 	// Return the spaceship so it can be added to the world
@@ -184,9 +195,14 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 {
 	shared_ptr<Shape> asteroid_shape = make_shared<Shape>("asteroid.shape");
 	for (uint i = 0; i < num_asteroids; i++) {
+		Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
+		shared_ptr<Sprite> asteroid_sprite
+			= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+		asteroid_sprite->SetLoopAnimation(true);
 		shared_ptr<GameObject> asteroid = make_shared<Asteroid>();
 		asteroid->SetBoundingShape(make_shared<BoundingSphere>(asteroid->GetThisPtr(), 10.0f));
-		asteroid->SetShape(asteroid_shape);
+		asteroid->SetSprite(asteroid_sprite);
+		asteroid->SetScale(0.2f);
 		mGameWorld->AddObject(asteroid);
 	}
 }
