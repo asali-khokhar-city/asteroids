@@ -147,6 +147,8 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		explosion->SetPosition(object->GetPosition());
 		explosion->SetRotation(object->GetRotation());
 		mGameWorld->AddObject(explosion);
+		// Decrement asteroid count
+		if (--mAsteroidCount <= 0) { SetTimer(500, START_NEXT_LEVEL); }
 	}
 }
 
@@ -164,8 +166,14 @@ void Asteroids::OnTimer(int value)
 	{
 		mLevel++;
 		int num_asteroids = 10 + 2 * mLevel;
+		CreateAsteroids(num_asteroids);
 	}
 
+	if (value == SHOW_GAME_OVER)
+	{
+		// Show game over label
+		mGameOverLabel->SetVisible(true);
+	}
 }
 
 // PROTECTED INSTANCE METHODS /////////////////////////////////////////////////
@@ -227,6 +235,18 @@ void Asteroids::CreateGUI()
 	// Add the GUILabel to the GUIComponent  
 	shared_ptr<GUIComponent> lives_component = static_pointer_cast<GUIComponent>(mLivesLabel);
 	mGameDisplay->GetContainer()->AddComponent(lives_component, GLVector2f(0.0f, 0.0f));
+
+	// Create a new GUILabel and wrap it up in a shared_ptr
+	mGameOverLabel = make_shared<GUILabel>("GAME OVER");
+	// Set the horizontal alignment of the label to GUI_HALIGN_CENTER
+	mGameOverLabel->SetHorizontalAlignment(GUIComponent::GUI_HALIGN_CENTER);
+	// Set the vertical alignment of the label to GUI_VALIGN_MIDDLE
+	mGameOverLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_MIDDLE);
+	// Set the visibility of the label to false (hidden)
+	mGameOverLabel->SetVisible(false);
+	// Add the GUILabel to the GUIComponent
+	shared_ptr<GUIComponent> game_over_component = static_pointer_cast<GUIComponent>(mGameOverLabel);
+	mGameDisplay->GetContainer()->AddComponent(game_over_component, GLVector2f(0.5f, 0.5f));
 }
 
 shared_ptr<GameObject> Asteroids::CreateExplosion()
@@ -274,6 +294,9 @@ void Asteroids::OnPlayerKilled(int lives_left)
 	// Get the lives left message as a string
 	std::string lives_msg = msg_stream.str();
 	mLivesLabel->SetText(lives_msg);
+	// Respawn player
+	if (lives_left > 0) { SetTimer(1000, CREATE_NEW_PLAYER); }
+	else { SetTimer(500, SHOW_GAME_OVER); }
 }
 
 

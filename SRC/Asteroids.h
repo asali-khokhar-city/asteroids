@@ -51,6 +51,7 @@ private:
 	shared_ptr<Spaceship> mSpaceship;
 	shared_ptr<GUILabel> mScoreLabel;
 	shared_ptr<GUILabel> mLivesLabel;
+	shared_ptr<GUILabel> mGameOverLabel;
 
 	uint mLevel;
 	uint mAsteroidCount;
