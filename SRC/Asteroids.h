@@ -9,6 +9,7 @@
 #include "ScoreKeeper.h"
 #include "Player.h"
 #include "IPlayerListener.h"
+#include "Logger.h"
 
 class GameObject;
 class Spaceship;
@@ -61,7 +62,6 @@ private:
 	void CreateGUI();
 	void CreateAsteroids(const uint num_asteroids);
 	shared_ptr<GameObject> CreateExplosion();
-	void CreateAmbientLight();
 	
 	const static uint SHOW_GAME_OVER = 0;
 	const static uint START_NEXT_LEVEL = 1;
@@ -69,6 +69,8 @@ private:
 
 	ScoreKeeper mScoreKeeper;
 	Player mPlayer;
+
+	Logger logger;
 };
 
 #endif

@@ -6,7 +6,7 @@
 Asteroid::Asteroid(void) : GameObject("Asteroid")
 {
 	mAngle = rand() % 360;
-	mRotation = 0;
+	mRotation = 0; // rand() % 90;
 	mPosition.x = rand() / 2;
 	mPosition.y = rand() / 2;
 	mPosition.z = 0.0;
