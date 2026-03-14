@@ -2,6 +2,7 @@
 #define __ASTEROID_H__
 
 #include "GameObject.h"
+#include "Logger.h"
 
 class Asteroid : public GameObject
 {
@@ -11,6 +12,8 @@ public:
 
 	bool CollisionTest(shared_ptr<GameObject> o);
 	void OnCollision(const GameObjectList& objects);
+private:
+	static Logger logger;
 };
 
 #endif
