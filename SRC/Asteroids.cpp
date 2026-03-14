@@ -282,7 +282,7 @@ void Asteroids::OnPlayerKilled(int lives_left)
 	}
 	else
 	{
-		logger.debug("Player died. Final score: " + std::to_string(mScoreKeeper.getScore()));
+		logger.debug(std::string("Player died. Final score: ") + std::to_string(mScoreKeeper.getScore()));
 		SetTimer(500, SHOW_GAME_OVER);
 	}
 }
