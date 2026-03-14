@@ -2,6 +2,7 @@
 #include "GameUtil.h"
 #include "Asteroid.h"
 #include "BoundingShape.h"
+#include "BoundingSphere.h"
 #include <string>
 
 Logger Asteroid::logger("asteroid.log");
@@ -14,7 +15,7 @@ Asteroid::Asteroid(void) : GameObject("Asteroid")
 	mPosition.y = rand() / 2;
 	mPosition.z = 0.0;
 	mVelocity.x = 10.0 * cos(DEG2RAD*mAngle);
-	mVelocity.y = 10.0 * sin(DEG2RAD*mAngle);
+	mVelocity.y = 10.0 * sin(DEG2RAD * mAngle);
 	mVelocity.z = 0.0;
 }
 
@@ -42,6 +43,8 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 			Asteroid* other = dynamic_cast<Asteroid*>(o.get());
 			if (other) {
 				BounceWith(*other);
+				ClampSpeed();
+				other->ClampSpeed();
 			}
 		}
 		else {
@@ -55,6 +58,8 @@ void Asteroid::BounceWith(Asteroid& other) {
 	float nx = other.GetPosition().x - GetPosition().x;
 	float ny = other.GetPosition().y - GetPosition().y;
 	float dist = sqrt(nx * nx + ny * ny);
+
+	if (dist == 0) { return; }
 
 	// Normalise collision vector
 	nx /= dist;
@@ -80,4 +85,41 @@ void Asteroid::BounceWith(Asteroid& other) {
 	other.SetVelocity(GLVector3f(other.GetVelocity().x + impX,
 		other.GetVelocity().y + impY,
 		other.GetVelocity().z));
+
+	// Find radius of asteroids
+	shared_ptr<BoundingSphere> sphere =
+		dynamic_pointer_cast<BoundingSphere>(GetBoundingShape());
+	shared_ptr<BoundingSphere> otherSphere =
+		dynamic_pointer_cast<BoundingSphere>(other.GetBoundingShape());
+
+	float radius = 0;
+	float otherRadius = 0;
+
+	if (sphere && otherSphere) {
+		radius = sphere->GetRadius();
+		otherRadius = otherSphere->GetRadius();
+	}
+
+	// Calculate overlap
+	float overlap = radius + otherRadius - dist;
+	if (overlap > 0) {
+		mPosition.x -= nx * overlap / 2.0f;
+		mPosition.y -= ny * overlap / 2.0f;
+		other.mPosition.x += nx * overlap / 2.0f;
+		other.mPosition.y += ny * overlap / 2.0f;
+	}
+}
+
+void Asteroid::ClampSpeed() {
+	float speed = sqrt(mVelocity.x * mVelocity.x +
+		mVelocity.y * mVelocity.y +
+		mVelocity.z * mVelocity.z);
+
+	if (speed > maxSpeed)
+	{
+		float scale = maxSpeed / speed;
+		mVelocity.x *= scale;
+		mVelocity.y *= scale;
+		mVelocity.z *= scale; // This is always 0 anyways
+	}
 }

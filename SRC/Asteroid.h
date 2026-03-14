@@ -13,7 +13,9 @@ public:
 	bool CollisionTest(shared_ptr<GameObject> o);
 	void OnCollision(const GameObjectList& objects);
 private:
+	float maxSpeed = 10;
 	void BounceWith(Asteroid& other);
+	void ClampSpeed();
 	static Logger logger;
 };
 
