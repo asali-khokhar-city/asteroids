@@ -75,6 +75,20 @@ void Asteroid::BounceWith(Asteroid& other) {
 	if (velocityAlongNormal > 0) return;
 
 	// Swap velocities
+	float restitution = 1;
+	float j = -(1 + restitution) * velocityAlongNormal / 2;
+
+	GLVector3f vel1 = GetVelocity();
+	GLVector3f vel2 = other.GetVelocity();
+
+	SetVelocity(GLVector3f(vel1.x -= j * nx,
+		vel1.y -= j * ny,
+		vel1.z));
+	SetVelocity(GLVector3f(vel2.x += j * nx,
+		vel2.y += j * ny,
+		vel2.z));
+
+	/*
 	float impX = nx * velocityAlongNormal / 2;
 	float impY = ny * velocityAlongNormal / 2;
 
@@ -85,6 +99,7 @@ void Asteroid::BounceWith(Asteroid& other) {
 	other.SetVelocity(GLVector3f(other.GetVelocity().x + impX,
 		other.GetVelocity().y + impY,
 		other.GetVelocity().z));
+	*/
 
 	// Find radius of asteroids
 	shared_ptr<BoundingSphere> sphere =
@@ -103,10 +118,18 @@ void Asteroid::BounceWith(Asteroid& other) {
 	// Calculate overlap
 	float overlap = radius + otherRadius - dist;
 	if (overlap > 0) {
+		SetPosition(GLVector3f(vel1.x -= nx * overlap / 2,
+			vel1.y -= ny * overlap / 2,
+			vel1.z));
+		SetPosition(GLVector3f(vel2.x += nx * overlap / 2,
+			vel2.y += ny * overlap / 2,
+			vel2.z));
+		/*
 		mPosition.x -= nx * overlap / 2.0f;
 		mPosition.y -= ny * overlap / 2.0f;
 		other.mPosition.x += nx * overlap / 2.0f;
 		other.mPosition.y += ny * overlap / 2.0f;
+		*/
 	}
 }
 
