@@ -54,82 +54,59 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 }
 
 void Asteroid::BounceWith(Asteroid& other) {
-	// Calculate collision vector between asteroids
-	float nx = other.GetPosition().x - GetPosition().x;
-	float ny = other.GetPosition().y - GetPosition().y;
-	float dist = sqrt(nx * nx + ny * ny);
+	GLVector3f pos1 = GetPosition();
+	GLVector3f pos2 = other.GetPosition();
 
-	if (dist == 0) { return; }
+	// Normal vector
+	GLVector3f normal = pos2 - pos1;
+	// Find vector magnitude (length of vector)
+	float dist = normal.length();
+	// Don't divide by 0
+	if (dist == 0.0f) return; 
+	// Normalise vector
+	normal /= dist;
 
-	// Normalise collision vector
-	nx /= dist;
-	ny /= dist;
-
-	// Find relative velocity along normal
-	float nvx = other.GetVelocity().x - GetVelocity().x;
-	float nyx = other.GetVelocity().y - GetVelocity().y;
-
-	float velocityAlongNormal = nvx * nx + nyx * ny;
-
-	// Bounce if moving towards
-	if (velocityAlongNormal > 0) return;
-
-	// Swap velocities
-	float restitution = 1;
-	float j = -(1 + restitution) * velocityAlongNormal / 2;
-
+	// Find relative velocity
 	GLVector3f vel1 = GetVelocity();
 	GLVector3f vel2 = other.GetVelocity();
+	GLVector3f relVel = vel2 - vel1;
 
-	SetVelocity(GLVector3f(vel1.x -= j * nx,
-		vel1.y -= j * ny,
-		vel1.z));
-	SetVelocity(GLVector3f(vel2.x += j * nx,
-		vel2.y += j * ny,
-		vel2.z));
+	// Find velocity along normal
+	float velAlongNormal = relVel.dot(normal);
+	// If they are not moving apart then ignore
+	// (objects are already moving away from one another)
+	if (velAlongNormal > 0) return; 
 
-	/*
-	float impX = nx * velocityAlongNormal / 2;
-	float impY = ny * velocityAlongNormal / 2;
+	// 0 to 1
+	// More than 1 would increase velocity after collisions
+	// 1 is perfect bounce
+	float bounceCoefficient = 1.0f; 
+	// Calculate impulse
+	float impulseMag = -(1 + bounceCoefficient) * velAlongNormal / 2.0f;
 
-	SetVelocity(GLVector3f(GetVelocity().x + impX,
-		GetVelocity().y + impY,
-		GetVelocity().z));
+	// Calculate impulse vector
+	GLVector3f impulse = normal * impulseMag;
 
-	other.SetVelocity(GLVector3f(other.GetVelocity().x + impX,
-		other.GetVelocity().y + impY,
-		other.GetVelocity().z));
-	*/
+	// Apply velocities
+	SetVelocity(vel1 - impulse);
+	other.SetVelocity(vel2 + impulse);
 
-	// Find radius of asteroids
-	shared_ptr<BoundingSphere> sphere =
-		dynamic_pointer_cast<BoundingSphere>(GetBoundingShape());
-	shared_ptr<BoundingSphere> otherSphere =
-		dynamic_pointer_cast<BoundingSphere>(other.GetBoundingShape());
+	// Fix overlap
+	auto sphere1 = dynamic_pointer_cast<BoundingSphere>(GetBoundingShape());
+	auto sphere2 = dynamic_pointer_cast<BoundingSphere>(other.GetBoundingShape());
 
-	float radius = 0;
-	float otherRadius = 0;
+	// If they're not spheres something has gone wrong...
+	if (!sphere1 || !sphere2) return;
 
-	if (sphere && otherSphere) {
-		radius = sphere->GetRadius();
-		otherRadius = otherSphere->GetRadius();
-	}
+	// Find overlap by looking at if the combined radii or larger than the distance between them
+	float overlap = sphere1->GetRadius() + sphere2->GetRadius() - dist;
 
-	// Calculate overlap
-	float overlap = radius + otherRadius - dist;
-	if (overlap > 0) {
-		SetPosition(GLVector3f(vel1.x -= nx * overlap / 2,
-			vel1.y -= ny * overlap / 2,
-			vel1.z));
-		SetPosition(GLVector3f(vel2.x += nx * overlap / 2,
-			vel2.y += ny * overlap / 2,
-			vel2.z));
-		/*
-		mPosition.x -= nx * overlap / 2.0f;
-		mPosition.y -= ny * overlap / 2.0f;
-		other.mPosition.x += nx * overlap / 2.0f;
-		other.mPosition.y += ny * overlap / 2.0f;
-		*/
+	// If there is an overlap, correct it by moving both asteroids away an equal distance
+	// in opposite directions
+	if (overlap > 0.0f) {
+		GLVector3f correction = normal * (overlap / 2.0f);
+		SetPosition(pos1 - correction);
+		other.SetPosition(pos2 + correction);
 	}
 }
 
