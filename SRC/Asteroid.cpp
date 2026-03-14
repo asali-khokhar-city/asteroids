@@ -37,10 +37,47 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 		logger.debug("Checking collision with object of type: " + typeName + ".");
 		if (typeName == "Asteroid") {
 			logger.debug("Asteroid has collided with another asteroid.");
-			// Collision script for bouncing
+
+			// Cast to Asteroid
+			Asteroid* other = dynamic_cast<Asteroid*>(o.get());
+			if (other) {
+				BounceWith(*other);
+			}
 		}
 		else {
 			mWorld->FlagForRemoval(GetThisPtr());
 		}
 	}
+}
+
+void Asteroid::BounceWith(Asteroid& other) {
+	// Calculate collision vector between asteroids
+	float nx = other.GetPosition().x - GetPosition().x;
+	float ny = other.GetPosition().y - GetPosition().y;
+	float dist = sqrt(nx * nx + ny * ny);
+
+	// Normalise collision vector
+	nx /= dist;
+	ny /= dist;
+
+	// Find relative velocity along normal
+	float nvx = other.GetVelocity().x - GetVelocity().x;
+	float nyx = other.GetVelocity().y - GetVelocity().y;
+
+	float velocityAlongNormal = nvx * nx + nyx * ny;
+
+	// Bounce if moving towards
+	if (velocityAlongNormal > 0) return;
+
+	// Swap velocities
+	float impX = nx * velocityAlongNormal / 2;
+	float impY = ny * velocityAlongNormal / 2;
+
+	SetVelocity(GLVector3f(GetVelocity().x + impX,
+		GetVelocity().y + impY,
+		GetVelocity().z));
+
+	other.SetVelocity(GLVector3f(other.GetVelocity().x + impX,
+		other.GetVelocity().y + impY,
+		other.GetVelocity().z));
 }
