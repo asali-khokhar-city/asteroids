@@ -11,9 +11,10 @@ Logger Asteroid::mLogger("asteroid.log");
 
 // Construct without specifying size
 
-Asteroid::Asteroid(AsteroidSize size) : GameObject("Asteroid")
+Asteroid::Asteroid(AsteroidSize size, shared_ptr<Sprite> sprite) : GameObject("Asteroid")
 {
 	mSize = size;
+	mSprite = sprite;
 
 	mAngle = rand() % 360;
 	mRotation = 0; // rand() % 90;
@@ -159,15 +160,6 @@ void Asteroid::Split(int count) {
 	// Size coefficient decides how much smaller the asteroid is
 	float sizeCoefficient = 0.2;
 
-	// Animation manager for asteroid sprite
-	// Preparing sprite for being assigned
-	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
-
-	shared_ptr<Sprite> asteroid_sprite =
-		make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
-
-	asteroid_sprite->SetLoopAnimation(true);
-
 	// Calculate new scale for sprite
 	float scale = GetScale();
 	float newScale = sizeCoefficient * scale;
@@ -180,7 +172,7 @@ void Asteroid::Split(int count) {
 	// Add asteroids
 	for (int i = 0; i < count; i++) {
 		// Create new, small asteroid
-		shared_ptr<Asteroid> newAsteroid = make_shared<Asteroid>(AsteroidSize::SMALL);
+		shared_ptr<Asteroid> newAsteroid = make_shared<Asteroid>(AsteroidSize::SMALL, mSprite);
 		// Set position at the origin of the original asteroid
 		newAsteroid->SetPosition(GetPosition());
 		// Set new scaled down visual size of the asteroid
@@ -190,7 +182,7 @@ void Asteroid::Split(int count) {
 			make_shared<BoundingSphere>(newAsteroid->GetThisPtr(), newRadius)
 		);
 		// Assign sprite
-		newAsteroid->SetSprite(asteroid_sprite);
+		newAsteroid->SetSprite(mSprite);
 		// Add it to the game world
 		mWorld->AddObject(newAsteroid);
 	}

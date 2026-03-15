@@ -13,7 +13,7 @@ public:
 		BIG
 	};
 
-	Asteroid(AsteroidSize size = AsteroidSize::BIG);
+	Asteroid(AsteroidSize size, shared_ptr<Sprite> sprite);
 	~Asteroid(void);
 
 	bool CollisionTest(shared_ptr<GameObject> o);
@@ -22,7 +22,7 @@ public:
 	AsteroidSize GetSize();
 private:
 	float mMaxSpeed = 10;
-
+	shared_ptr<Sprite> mSprite;
 
 	AsteroidSize mSize;
 
