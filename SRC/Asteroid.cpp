@@ -50,12 +50,13 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 	for (const auto &o : objects) {
 		std::string typeName = o->GetType().GetTypeName();
 		if (typeName == "Asteroid") {
-			// Cast to Asteroid
-			Asteroid* other = dynamic_cast<Asteroid*>(o.get());
+			// Cast to GameObject
+			//Asteroid* other = dynamic_cast<Asteroid*>(o.get());
+			GameObject* other = dynamic_cast<GameObject*>(o.get());
 			if (other) {
 				BounceWith(*other);
-				ClampSpeed();
-				other->ClampSpeed();
+				SetVelocity(ClampSpeed(mMaxSpeed));
+				other->ClampSpeed(mMaxSpeed);
 			}
 		}
 		else if (typeName == "Bullet") {
@@ -68,6 +69,9 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 			mWorld->FlagForRemoval(GetThisPtr());
 			break;
 		}
+		else if (typeName == "Spaceship") {
+			// 
+		}
 		else {
 			mWorld->FlagForRemoval(GetThisPtr());
 		}
@@ -78,7 +82,7 @@ Asteroid::AsteroidSize Asteroid::GetSize() {
 	return mSize;
 }
 
-void Asteroid::BounceWith(Asteroid& other) {
+void Asteroid::BounceWith(GameObject& other) {
 	GLVector3f pos1 = GetPosition();
 	GLVector3f pos2 = other.GetPosition();
 
@@ -126,26 +130,12 @@ void Asteroid::BounceWith(Asteroid& other) {
 	// Find overlap by looking at if the combined radii or larger than the distance between them
 	float overlap = sphere1->GetRadius() + sphere2->GetRadius() - dist;
 
-	// If there is an overlap, correct it by moving both asteroids away an equal distance
+	// If there is an overlap, correct it by moving both objects away an equal distance
 	// in opposite directions
 	if (overlap > 0.0f) {
 		GLVector3f correction = normal * (overlap / 2.0f);
 		SetPosition(pos1 - correction);
 		other.SetPosition(pos2 + correction);
-	}
-}
-
-void Asteroid::ClampSpeed() {
-	float speed = sqrt(mVelocity.x * mVelocity.x +
-		mVelocity.y * mVelocity.y +
-		mVelocity.z * mVelocity.z);
-
-	if (speed > mMaxSpeed)
-	{
-		float scale = mMaxSpeed / speed;
-		mVelocity.x *= scale;
-		mVelocity.y *= scale;
-		mVelocity.z *= scale; // This is always 0 anyways
 	}
 }
 

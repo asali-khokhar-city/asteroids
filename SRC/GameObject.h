@@ -60,6 +60,8 @@ public:
 
 	shared_ptr<GameObject> GetThisPtr() { return shared_from_this(); }
 
+	GLVector3f GameObject::ClampSpeed(float maxSpeed);
+
 protected:
 	GameObjectType mType;
 

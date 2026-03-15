@@ -26,8 +26,7 @@ private:
 
 	AsteroidSize mSize;
 
-	void BounceWith(Asteroid& other);
-	void ClampSpeed();
+	void BounceWith(GameObject& other);
 	void Split(int count);
 
 	static Logger mLogger;

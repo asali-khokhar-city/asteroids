@@ -104,3 +104,22 @@ void GameObject::PostRender(void)
 	// Restore projection matrix from stack
 	glPopMatrix();
 }
+
+GLVector3f GameObject::ClampSpeed(float maxSpeed) {
+
+	GLVector3f velocity = GetVelocity();
+
+	float speed = sqrt(velocity.x * velocity.x +
+		velocity.y * velocity.y +
+		velocity.z * velocity.z);
+
+	if (speed > maxSpeed)
+	{
+		float scale = maxSpeed / speed;
+		velocity.x *= scale;
+		velocity.y *= scale;
+		velocity.z *= scale; // This is always 0 anyways
+	}
+
+	return velocity;
+}
