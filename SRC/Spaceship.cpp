@@ -109,6 +109,7 @@ bool Spaceship::CollisionTest(shared_ptr<GameObject> o)
 
 void Spaceship::OnCollision(const GameObjectList &objects)
 {
+	bool removed = false;
 	for (const auto& o : objects) {
 		std::string typeName = o->GetType().GetTypeName();
 		if (typeName == "Asteroid") {
@@ -122,7 +123,10 @@ void Spaceship::OnCollision(const GameObjectList &objects)
 				}
 				else {
 					mLogger.debug("Spaceship has collided with large asteroid.");
-					mWorld->FlagForRemoval(GetThisPtr());
+					if (!removed) {
+						removed = true;
+						mWorld->FlagForRemoval(GetThisPtr());
+					}
 				}
 			}
 		}

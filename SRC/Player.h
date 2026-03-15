@@ -21,8 +21,12 @@ public:
 	void OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 	{
 		if (object->GetType() == GameObjectType("Spaceship")) {
-			mLives -= 1;
-			FirePlayerKilled();
+			if (mLives > 0) {
+				mLogger.debug("Spaceship removed, lives before decrement: " + std::to_string(mLives));
+				mLives -= 1;
+				FirePlayerKilled();
+				mLogger.debug("Lives after decrement: " + std::to_string(mLives));
+			}
 		}
 	}
 
@@ -42,6 +46,7 @@ public:
 
 private:
 	int mLives;
+	Logger mLogger = Logger("player.log");
 
 	typedef std::list< shared_ptr<IPlayerListener> > PlayerListenerList;
 
