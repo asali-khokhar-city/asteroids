@@ -60,7 +60,14 @@ public:
 
 	shared_ptr<GameObject> GetThisPtr() { return shared_from_this(); }
 
-	GLVector3f GameObject::ClampSpeed(float maxSpeed);
+	void SetMaxSpeed(float ms) {
+		mMaxSpeed = ms;
+	}
+	float GetMaxSpeed() {
+		return mMaxSpeed;
+	}
+
+	GLVector3f GameObject::ClampSpeed();
 
 protected:
 	GameObjectType mType;
@@ -72,6 +79,8 @@ protected:
 	GLfloat mAngle;
 	GLfloat mRotation;
 	GLfloat mScale;
+
+	float mMaxSpeed;
 
 	shared_ptr<Shape> mShape;
 	shared_ptr<Sprite> mSprite;

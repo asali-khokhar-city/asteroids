@@ -105,7 +105,7 @@ void GameObject::PostRender(void)
 	glPopMatrix();
 }
 
-GLVector3f GameObject::ClampSpeed(float maxSpeed) {
+GLVector3f GameObject::ClampSpeed() {
 
 	GLVector3f velocity = GetVelocity();
 
@@ -113,9 +113,9 @@ GLVector3f GameObject::ClampSpeed(float maxSpeed) {
 		velocity.y * velocity.y +
 		velocity.z * velocity.z);
 
-	if (speed > maxSpeed)
+	if (speed > mMaxSpeed)
 	{
-		float scale = maxSpeed / speed;
+		float scale = mMaxSpeed / speed;
 		velocity.x *= scale;
 		velocity.y *= scale;
 		velocity.z *= scale; // This is always 0 anyways

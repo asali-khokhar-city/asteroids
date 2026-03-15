@@ -28,6 +28,8 @@ public:
 	bool CollisionTest(shared_ptr<GameObject> o);
 	void OnCollision(const GameObjectList &objects);
 
+	float GetMaxSpeed();
+
 private:
 	float mThrust;
 

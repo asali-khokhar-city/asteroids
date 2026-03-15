@@ -16,18 +16,21 @@ using namespace std;
 Spaceship::Spaceship()
 	: GameObject("Spaceship"), mThrust(0)
 {
+	SetMaxSpeed(20);
 }
 
 /** Construct a spaceship with given position, velocity, acceleration, angle, and rotation. */
 Spaceship::Spaceship(GLVector3f p, GLVector3f v, GLVector3f a, GLfloat h, GLfloat r)
 	: GameObject("Spaceship", p, v, a, h, r), mThrust(0)
 {
+	SetMaxSpeed(20);
 }
 
 /** Copy constructor. */
 Spaceship::Spaceship(const Spaceship& s)
 	: GameObject(s), mThrust(0)
 {
+	SetMaxSpeed(20);
 }
 
 /** Destructor. */
@@ -124,4 +127,8 @@ void Spaceship::OnCollision(const GameObjectList &objects)
 			}
 		}
 	}
+}
+
+float Spaceship::GetMaxSpeed() {
+	return mMaxSpeed;
 }

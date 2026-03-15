@@ -29,6 +29,8 @@ Asteroid::Asteroid(AsteroidSize size) : GameObject("Asteroid")
 	mVelocity.x = initialSpeed * cos(DEG2RAD*mAngle);
 	mVelocity.y = initialSpeed * sin(DEG2RAD * mAngle);
 	mVelocity.z = 0.0;
+
+	SetMaxSpeed(15);
 }
 
 
@@ -55,8 +57,8 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 			GameObject* other = dynamic_cast<GameObject*>(o.get());
 			if (other) {
 				BounceWith(*other);
-				SetVelocity(ClampSpeed(mMaxSpeed));
-				other->ClampSpeed(mMaxSpeed);
+				SetVelocity(ClampSpeed());
+				other->SetVelocity(other->ClampSpeed());
 			}
 		}
 		else if (typeName == "Bullet") {
@@ -70,7 +72,16 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 			break;
 		}
 		else if (typeName == "Spaceship") {
-			// 
+			mLogger.debug("Asteroid has collided with spaceship.");
+			if (mSize == AsteroidSize::SMALL) {
+				mLogger.debug("Bounce asteroid and spaceship.");
+				GameObject* other = dynamic_cast<GameObject*>(o.get());
+				if (other) {
+					BounceWith(*other);
+					SetVelocity(ClampSpeed());
+					other->SetVelocity(other->ClampSpeed());
+				}
+			}
 		}
 		else {
 			mWorld->FlagForRemoval(GetThisPtr());
