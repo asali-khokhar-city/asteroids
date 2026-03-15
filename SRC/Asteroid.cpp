@@ -3,21 +3,35 @@
 #include "Asteroid.h"
 #include "BoundingShape.h"
 #include "BoundingSphere.h"
+#include "Animation.h"
+#include "AnimationManager.h"
 #include <string>
 
-Logger Asteroid::logger("asteroid.log");
+Logger Asteroid::mLogger("asteroid.log");
 
-Asteroid::Asteroid(void) : GameObject("Asteroid")
+// Construct without specifying size
+
+Asteroid::Asteroid(AsteroidSize size) : GameObject("Asteroid")
 {
+	mSize = size;
+
 	mAngle = rand() % 360;
 	mRotation = 0; // rand() % 90;
+
 	mPosition.x = rand() / 2;
 	mPosition.y = rand() / 2;
 	mPosition.z = 0.0;
-	mVelocity.x = 10.0 * cos(DEG2RAD*mAngle);
-	mVelocity.y = 10.0 * sin(DEG2RAD * mAngle);
+
+	// Ternary to decide initial speed of asteroid
+	// Smaller asteroids are faster
+	float initialSpeed = (mSize == AsteroidSize::BIG) ? 10 : 15;
+
+	mVelocity.x = initialSpeed * cos(DEG2RAD*mAngle);
+	mVelocity.y = initialSpeed * sin(DEG2RAD * mAngle);
 	mVelocity.z = 0.0;
 }
+
+
 
 Asteroid::~Asteroid(void)
 {
@@ -35,9 +49,9 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 {
 	for (const auto &o : objects) {
 		std::string typeName = o->GetType().GetTypeName();
-		logger.debug("Checking collision with object of type: " + typeName + ".");
+		mLogger.debug("Checking collision with object of type: " + typeName + ".");
 		if (typeName == "Asteroid") {
-			logger.debug("Asteroid has collided with another asteroid.");
+			mLogger.debug("Asteroid has collided with another asteroid.");
 
 			// Cast to Asteroid
 			Asteroid* other = dynamic_cast<Asteroid*>(o.get());
@@ -47,10 +61,24 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 				other->ClampSpeed();
 			}
 		}
+		else if (typeName == "Bullet") {
+			// spawn 2 smaller asteroids that do not damage the player
+			mLogger.debug("Asteroid is struck by bullet. Splitting asteroid.");
+			if (mSize == AsteroidSize::BIG) {
+				Split(2);
+			}
+
+			mWorld->FlagForRemoval(GetThisPtr());
+			break;
+		}
 		else {
 			mWorld->FlagForRemoval(GetThisPtr());
 		}
 	}
+}
+
+Asteroid::AsteroidSize Asteroid::GetSize() {
+	return mSize;
 }
 
 void Asteroid::BounceWith(Asteroid& other) {
@@ -115,11 +143,57 @@ void Asteroid::ClampSpeed() {
 		mVelocity.y * mVelocity.y +
 		mVelocity.z * mVelocity.z);
 
-	if (speed > maxSpeed)
+	if (speed > mMaxSpeed)
 	{
-		float scale = maxSpeed / speed;
+		float scale = mMaxSpeed / speed;
 		mVelocity.x *= scale;
 		mVelocity.y *= scale;
 		mVelocity.z *= scale; // This is always 0 anyways
+	}
+}
+
+void Asteroid::Split(int count) {
+	// Only big asteroids should be split
+	if (mSize != AsteroidSize::BIG) {
+		return;
+	}
+
+	// Size coefficient decides how much smaller the asteroid is
+	float sizeCoefficient = 0.2;
+
+	// Animation manager for asteroid sprite
+	// Preparing sprite for being assigned
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
+
+	shared_ptr<Sprite> asteroid_sprite =
+		make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+
+	asteroid_sprite->SetLoopAnimation(true);
+
+	// Calculate new scale for sprite
+	float scale = GetScale();
+	float newScale = sizeCoefficient * scale;
+
+	// Calculate new radius for collision
+	auto sphere = dynamic_pointer_cast<BoundingSphere>(GetBoundingShape());
+	float radius = sphere->GetRadius();
+	float newRadius = sizeCoefficient * radius;
+
+	// Add asteroids
+	for (int i = 0; i < count; i++) {
+		// Create new, small asteroid
+		shared_ptr<Asteroid> newAsteroid = make_shared<Asteroid>(AsteroidSize::SMALL);
+		// Set position at the origin of the original asteroid
+		newAsteroid->SetPosition(GetPosition());
+		// Set new scaled down visual size of the asteroid
+		newAsteroid->SetScale(newScale);
+		// Set new scaled down radius
+		newAsteroid->SetBoundingShape(
+			make_shared<BoundingSphere>(newAsteroid->GetThisPtr(), newRadius)
+		);
+		// Assign sprite
+		newAsteroid->SetSprite(asteroid_sprite);
+		// Add it to the game world
+		mWorld->AddObject(newAsteroid);
 	}
 }

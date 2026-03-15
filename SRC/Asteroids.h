@@ -70,7 +70,7 @@ private:
 	ScoreKeeper mScoreKeeper;
 	Player mPlayer;
 
-	Logger logger;
+	Logger mLogger;
 };
 
 #endif

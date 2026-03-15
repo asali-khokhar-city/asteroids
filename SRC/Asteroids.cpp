@@ -35,7 +35,7 @@ Asteroids::~Asteroids(void)
 void Asteroids::Start()
 {
 	// Create a logger
-	logger = Logger("asteroids.log");
+	mLogger = Logger("asteroids.log");
 
 	// Create a shared pointer for the Asteroids game object - DO NOT REMOVE
 	shared_ptr<Asteroids> thisPtr = shared_ptr<Asteroids>(this);
@@ -282,7 +282,7 @@ void Asteroids::OnPlayerKilled(int lives_left)
 	}
 	else
 	{
-		logger.debug(std::string("Player died. Final score: ")
+		mLogger.debug(std::string("Player died. Final score: ")
 			+ std::to_string(mScoreKeeper.getScore()));
 		SetTimer(500, SHOW_GAME_OVER);
 	}

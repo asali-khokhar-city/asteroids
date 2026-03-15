@@ -7,16 +7,30 @@
 class Asteroid : public GameObject
 {
 public:
-	Asteroid(void);
+	// Asteroid sizes
+	enum class AsteroidSize {
+		SMALL,
+		BIG
+	};
+
+	Asteroid(AsteroidSize size = AsteroidSize::BIG);
 	~Asteroid(void);
 
 	bool CollisionTest(shared_ptr<GameObject> o);
 	void OnCollision(const GameObjectList& objects);
+
+	AsteroidSize GetSize();
 private:
-	float maxSpeed = 10;
+	float mMaxSpeed = 10;
+
+
+	AsteroidSize mSize;
+
 	void BounceWith(Asteroid& other);
 	void ClampSpeed();
-	static Logger logger;
+	void Split(int count);
+
+	static Logger mLogger;
 };
 
 #endif
