@@ -20,7 +20,16 @@ public:
 	void OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 	{
 		if (object->GetType() == GameObjectType("Asteroid")) {
- 			mScore += 10;
+			Asteroid* asteroid = dynamic_cast<Asteroid*>(object.get());
+			if (asteroid) {
+				if (asteroid->GetSize() == Asteroid::AsteroidSize::BIG) {
+					mScore += 10;
+				}
+				else if (asteroid->GetSize() == Asteroid::AsteroidSize::SMALL) {
+					mScore += 2;
+				}
+			}
+ 			
 			FireScoreChanged();
 		}
 	}
