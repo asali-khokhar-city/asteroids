@@ -4,6 +4,7 @@
 #include "GameUtil.h"
 #include "GameObject.h"
 #include "Shape.h"
+#include "Logger.h"
 
 class Spaceship : public GameObject
 {
@@ -33,6 +34,8 @@ private:
 	shared_ptr<Shape> mSpaceshipShape;
 	shared_ptr<Shape> mThrusterShape;
 	shared_ptr<Shape> mBulletShape;
+
+	static Logger mLogger;
 };
 
 #endif

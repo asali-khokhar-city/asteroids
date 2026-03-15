@@ -49,10 +49,7 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 {
 	for (const auto &o : objects) {
 		std::string typeName = o->GetType().GetTypeName();
-		mLogger.debug("Checking collision with object of type: " + typeName + ".");
 		if (typeName == "Asteroid") {
-			mLogger.debug("Asteroid has collided with another asteroid.");
-
 			// Cast to Asteroid
 			Asteroid* other = dynamic_cast<Asteroid*>(o.get());
 			if (other) {

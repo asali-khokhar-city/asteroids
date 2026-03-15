@@ -3,6 +3,10 @@
 #include "Bullet.h"
 #include "Spaceship.h"
 #include "BoundingSphere.h"
+#include "Asteroid.h"
+#include "Logger.h"
+
+Logger Spaceship::mLogger("spaceship.log");
 
 using namespace std;
 
@@ -102,5 +106,22 @@ bool Spaceship::CollisionTest(shared_ptr<GameObject> o)
 
 void Spaceship::OnCollision(const GameObjectList &objects)
 {
-	mWorld->FlagForRemoval(GetThisPtr());
+	for (const auto& o : objects) {
+		std::string typeName = o->GetType().GetTypeName();
+		if (typeName == "Asteroid") {
+			// Cast to Asteroid
+			if (Asteroid* asteroid = dynamic_cast<Asteroid*>(o.get())) {
+				if (asteroid->GetSize() == Asteroid::AsteroidSize::SMALL) {
+					// Add collision here?
+					mLogger.debug("Spaceship has collided with small asteroid.");
+					break;
+
+				}
+				else {
+					mLogger.debug("Spaceship has collided with large asteroid.");
+					mWorld->FlagForRemoval(GetThisPtr());
+				}
+			}
+		}
+	}
 }
