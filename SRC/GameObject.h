@@ -55,6 +55,7 @@ public:
 
 	void SetShape(shared_ptr<Shape> shape) { mShape = shape; }
 	void SetSprite(shared_ptr<Sprite> sprite) { mSprite = sprite; }
+	shared_ptr<Sprite> GetSprite() { return mSprite; }
 	const shared_ptr<BoundingShape>& GetBoundingShape() const { return mBoundingShape; }
 	void SetBoundingShape(shared_ptr<BoundingShape> bs) { mBoundingShape = bs; }
 

@@ -11,7 +11,7 @@ Logger Asteroid::mLogger("asteroid.log");
 
 // Construct without specifying size
 
-Asteroid::Asteroid(AsteroidSize size, shared_ptr<Sprite> sprite) : GameObject("Asteroid")
+Asteroid::Asteroid(AsteroidSize size) : GameObject("Asteroid")
 {
 	mSize = size;
 	mSprite = sprite;
@@ -182,7 +182,7 @@ void Asteroid::Split(int count) {
 			make_shared<BoundingSphere>(newAsteroid->GetThisPtr(), newRadius)
 		);
 		// Assign sprite
-		newAsteroid->SetSprite(mSprite);
+		newAsteroid->SetSprite(GetSprite());
 		// Add it to the game world
 		mWorld->AddObject(newAsteroid);
 	}
