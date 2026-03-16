@@ -24,10 +24,10 @@ public:
 			Asteroid* asteroid = dynamic_cast<Asteroid*>(object.get());
 			if (asteroid) {
 				if (asteroid->GetSize() == Asteroid::AsteroidSize::BIG) {
-					mScore += 6;
+					mScore += 15;
 				}
 				else if (asteroid->GetSize() == Asteroid::AsteroidSize::SMALL) {
-					mScore += 2;
+					mScore += 5;
 				}
 			}
  			
