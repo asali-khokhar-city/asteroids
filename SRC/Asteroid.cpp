@@ -14,7 +14,7 @@ Logger Asteroid::mLogger("asteroid.log");
 Asteroid::Asteroid(AsteroidSize size) : GameObject("Asteroid")
 {
 	mSize = size;
-	mSprite = sprite;
+	//mSprite = sprite;
 
 	mAngle = rand() % 360;
 	mRotation = 0; // rand() % 90;
@@ -172,7 +172,7 @@ void Asteroid::Split(int count) {
 	// Add asteroids
 	for (int i = 0; i < count; i++) {
 		// Create new, small asteroid
-		shared_ptr<Asteroid> newAsteroid = make_shared<Asteroid>(AsteroidSize::SMALL, mSprite);
+		shared_ptr<Asteroid> newAsteroid = make_shared<Asteroid>(AsteroidSize::SMALL);
 		// Set position at the origin of the original asteroid
 		newAsteroid->SetPosition(GetPosition());
 		// Set new scaled down visual size of the asteroid

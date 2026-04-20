@@ -12,7 +12,9 @@
 #include "GUILabel.h"
 #include "Explosion.h"
 #include "Logger.h"
+#include "Sprite.h"
 #include <string>
+#include <vector>
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
@@ -37,6 +39,9 @@ void Asteroids::Start()
 	// Create a logger
 	mLogger = Logger("asteroids.log");
 
+	// Generate a random seed for randomisation using current time
+	std::srand(time(0));
+		
 	// Create a shared pointer for the Asteroids game object - DO NOT REMOVE
 	shared_ptr<Asteroids> thisPtr = shared_ptr<Asteroids>(this);
 
@@ -61,6 +66,9 @@ void Asteroids::Start()
 
 	Animation *explosion_anim = AnimationManager::GetInstance().CreateAnimationFromFile("explosion", 64, 1024, 64, 64, "explosion_fs.png");
 	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
+	// FIX: asteroid2_fs.png and asteroid3_fs.png cannot be found by the build project (memory error)
+	Animation *asteroid2_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid2", 128, 8192, 128, 128, "asteroid2_fs.png");
+	Animation *asteroid3_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid3", 64, 4096, 64, 64, "asteroid3_fs.png");
 	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
 
 	// Create a spaceship and add it to the world
@@ -200,10 +208,12 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 
 void Asteroids::CreateAsteroids(const uint num_asteroids)
 {
+	std::vector<std::string> anims = { "asteroid1", "asteroid2", "asteroid3"};
 	mAsteroidCount = num_asteroids;
 	for (uint i = 0; i < num_asteroids; i++)
 	{
-		Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName("asteroid1");
+		std::string anim_name = anims[rand() % anims.size()];
+		Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName(anim_name);
 		shared_ptr<Sprite> asteroid_sprite
 			= make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
 		asteroid_sprite->SetLoopAnimation(true);
