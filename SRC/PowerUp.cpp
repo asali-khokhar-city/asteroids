@@ -5,7 +5,7 @@
 #include "Logger.h"
 
 PowerUp::PowerUp(Player* player)
-	: GameObject("PowerUp"), mPlayer(player), mLogger("asteroid.log") {
+	: GameObject("PowerUp"), mPlayer(player), mLogger("powerup.log") {
 }
 
 PowerUp::~PowerUp(void)
