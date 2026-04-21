@@ -84,6 +84,9 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 				}
 			}
 		}
+		else if (typeName.find("PowerUp") != std::string::npos) {
+			mLogger.debug("Collided with power up.");
+		}
 		else {
 			mWorld->FlagForRemoval(GetThisPtr());
 		}

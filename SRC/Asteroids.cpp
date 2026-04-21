@@ -213,6 +213,10 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 
 shared_ptr<GameObject> Asteroids::CreatePowerUp()
 {
+	// TODO: Ensure that powerup does not cause asteroid collisions/explosions
+	// TODO: Add other types of powerups
+	// TODO: Add powerup spawning
+
 	mLogger.debug("Powerup is created/added to game world.");
 
 	shared_ptr<GameObject> p = make_shared<ExtraLifePowerUp>(&mPlayer);
