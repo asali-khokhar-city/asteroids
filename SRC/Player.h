@@ -58,7 +58,6 @@ public:
 
 private:
 	int mLives;
-	Logger mLogger = Logger("player.log");
 
 	typedef std::list< shared_ptr<IPlayerListener> > PlayerListenerList;
 

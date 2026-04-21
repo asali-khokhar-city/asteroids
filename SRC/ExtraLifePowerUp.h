@@ -2,6 +2,7 @@
 #define __EXTRALIFEPOWERUP_H__
 
 #include "PowerUp.h"
+#include "Player.h"
 
 class ExtraLifePowerUp : public PowerUp {
 public:

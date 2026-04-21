@@ -2,9 +2,10 @@
 #include "BoundingSphere.h"
 #include "Spaceship.h"
 #include "Player.h"
+#include "Logger.h"
 
 PowerUp::PowerUp(Player* player)
-	: GameObject("PowerUp"), mPlayer(player) {
+	: GameObject("PowerUp"), mPlayer(player), mLogger("asteroid.log") {
 }
 
 PowerUp::~PowerUp(void)
@@ -20,9 +21,11 @@ bool PowerUp::CollisionTest(shared_ptr<GameObject> o) {
 }
 
 void PowerUp::OnCollision(const GameObjectList& objects) {
+	mLogger.debug("Testing for powerup collisions.");
 	for (const auto& o : objects) {
 		std::string typeName = o->GetType().GetTypeName();
 		if (typeName == "Spaceship") {
+			mLogger.debug("Powerup effect is applied from collision.");
 			Spaceship* ship = dynamic_cast<Spaceship*>(o.get());
 			ApplyEffect(*ship);
 

@@ -1,5 +1,6 @@
 #include "ExtraLifePowerUp.h"
 #include "Spaceship.h"
+#include "Player.h"
 #include "GameWorld.h"
 #include "Asteroids.h"
 

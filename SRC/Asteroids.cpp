@@ -15,6 +15,7 @@
 #include "Sprite.h"
 #include <string>
 #include <vector>
+#include "ExtraLifePowerUp.h"
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
@@ -75,6 +76,9 @@ void Asteroids::Start()
 	mGameWorld->AddObject(CreateSpaceship());
 	// Create some asteroids and add them to the world
 	CreateAsteroids(10);
+
+	// Add a powerup for testing
+	mGameWorld->AddObject(CreatePowerUp());
 
 	//Create the GUI
 	CreateGUI();
@@ -203,7 +207,19 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 	mSpaceship->Reset();
 	// Return the spaceship so it can be added to the world
 	return mSpaceship;
+}
 
+shared_ptr<GameObject> Asteroids::CreatePowerUp()
+{
+	mLogger.debug("Powerup is created/added to game world.");
+
+	shared_ptr<GameObject> p = make_shared<ExtraLifePowerUp>(&mPlayer);
+	p->SetBoundingShape(make_shared<BoundingSphere>(p->GetThisPtr(), 5.0f));
+
+	// Ensure powerup is in the middle of the world for testing
+	p->SetPosition(GLVector3f(0, 0, 0));
+
+	return p;
 }
 
 void Asteroids::CreateAsteroids(const uint num_asteroids)
