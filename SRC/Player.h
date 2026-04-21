@@ -22,10 +22,9 @@ public:
 	{
 		if (object->GetType() == GameObjectType("Spaceship")) {
 			if (mLives > 0) {
-				mLogger.debug("Spaceship removed, lives before decrement: " + std::to_string(mLives));
 				mLives -= 1;
+				FireLivesChanged();
 				FirePlayerKilled();
-				mLogger.debug("Lives after decrement: " + std::to_string(mLives));
 			}
 		}
 	}
@@ -42,6 +41,19 @@ public:
 			lit != mListeners.end(); ++lit) {
 			(*lit)->OnPlayerKilled(mLives);
 		}
+	}
+
+	void FireLivesChanged()
+	{
+		for (auto& l : mListeners) {
+			l->OnLivesChanged(mLives);
+		}
+	}
+
+	void AddLife()
+	{
+		mLives++;
+		FireLivesChanged();
 	}
 
 private:

@@ -271,20 +271,22 @@ void Asteroids::OnScoreChanged(int score)
 	mScoreLabel->SetText(score_msg);
 }
 
-void Asteroids::OnPlayerKilled(int lives_left)
+void Asteroids::OnLivesChanged(int lives_left)
 {
-	
-	shared_ptr<GameObject> explosion = CreateExplosion();
-	explosion->SetPosition(mSpaceship->GetPosition());
-	explosion->SetRotation(mSpaceship->GetRotation());
-	mGameWorld->AddObject(explosion);
-
 	// Format the lives left message using an string-based stream
 	std::ostringstream msg_stream;
 	msg_stream << "Lives: " << lives_left;
 	// Get the lives left message as a string
 	std::string lives_msg = msg_stream.str();
 	mLivesLabel->SetText(lives_msg);
+}
+
+void Asteroids::OnPlayerKilled(int lives_left)
+{
+	shared_ptr<GameObject> explosion = CreateExplosion();
+	explosion->SetPosition(mSpaceship->GetPosition());
+	explosion->SetRotation(mSpaceship->GetRotation());
+	mGameWorld->AddObject(explosion);
 
 	if (lives_left > 0) 
 	{ 
@@ -309,7 +311,6 @@ shared_ptr<GameObject> Asteroids::CreateExplosion()
 	explosion->Reset();
 	return explosion;
 }
-
 
 
 

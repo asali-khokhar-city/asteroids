@@ -38,6 +38,7 @@ public:
 	// Declaration of the IPlayerLister interface //////////////////////////////
 
 	void OnPlayerKilled(int lives_left);
+	void OnLivesChanged(int lives_left);
 
 	// Declaration of IGameWorldListener interface //////////////////////////////
 
