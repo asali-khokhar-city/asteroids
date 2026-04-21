@@ -16,6 +16,8 @@
 #include <string>
 #include <vector>
 #include "ExtraLifePowerUp.h"
+#include "ImageManager.h"
+#include "Image.h"
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
@@ -67,10 +69,10 @@ void Asteroids::Start()
 
 	Animation *explosion_anim = AnimationManager::GetInstance().CreateAnimationFromFile("explosion", 64, 1024, 64, 64, "explosion_fs.png");
 	Animation *asteroid1_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid1", 128, 8192, 128, 128, "asteroid1_fs.png");
-	// FIX: asteroid2_fs.png and asteroid3_fs.png cannot be found by the build project (memory error)
 	Animation *asteroid2_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid2", 128, 8192, 128, 128, "asteroid2_fs.png");
 	Animation *asteroid3_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid3", 64, 4096, 64, 64, "asteroid3_fs.png");
-	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");
+	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");	
+	Animation* powerup_img = AnimationManager::GetInstance().CreateAnimationFromFile("green-heart", 64, 64, 64, 64, "green-heart.png");
 
 	// Create a spaceship and add it to the world
 	mGameWorld->AddObject(CreateSpaceship());
@@ -214,10 +216,23 @@ shared_ptr<GameObject> Asteroids::CreatePowerUp()
 	mLogger.debug("Powerup is created/added to game world.");
 
 	shared_ptr<GameObject> p = make_shared<ExtraLifePowerUp>(&mPlayer);
-	p->SetBoundingShape(make_shared<BoundingSphere>(p->GetThisPtr(), 5.0f));
 
-	// Ensure powerup is in the middle of the world for testing
-	p->SetPosition(GLVector3f(0, 0, 0));
+	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("green-heart");
+
+	shared_ptr<Sprite> powerup_sprite =
+		make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
+
+	p->SetSprite(powerup_sprite);
+
+	p->SetScale(0.2f);
+
+	float radius = anim_ptr->GetWidth() * p->GetScale() * 0.3f;
+
+	p->SetBoundingShape(make_shared<BoundingSphere>(p->GetThisPtr(), radius));
+
+	// Ensure powerup is near the middle of the world for testing
+	p->SetPosition(GLVector3f(20, 20, 0));
+
 
 	return p;
 }
