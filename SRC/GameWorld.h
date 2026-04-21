@@ -48,6 +48,8 @@ public:
 
 	void WrapXY(float &x, float &y);
 
+	int GetLastDeltaTime() { return mLastDeltaTime; }
+
 protected:
 	void UpdateObjects(int t);
 	void UpdateCollisions(int t);
@@ -69,6 +71,9 @@ protected:
 	int mWidth;
 	// The height of the world
 	int mHeight;
+
+	// The time elapsed since the previous frame update
+	int mLastDeltaTime;
 };
 
 #endif

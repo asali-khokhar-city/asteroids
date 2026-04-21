@@ -19,6 +19,8 @@ GameWorld::~GameWorld(void)
 /** Update the world. */
 void GameWorld::Update(int t)
 {
+	mLastDeltaTime = t;
+
 	UpdateObjects(t);
 	UpdateCollisions(t);
 
