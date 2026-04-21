@@ -1,9 +1,10 @@
 #include "PowerUp.h"
 #include "BoundingSphere.h"
 #include "Spaceship.h"
+#include "Player.h"
 
-PowerUp::PowerUp()
-	: GameObject("PowerUp") {
+PowerUp::PowerUp(Player* player)
+	: GameObject("PowerUp"), mPlayer(player) {
 }
 
 PowerUp::~PowerUp(void)

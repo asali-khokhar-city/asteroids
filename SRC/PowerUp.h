@@ -6,7 +6,7 @@
 
 class PowerUp : public GameObject {
 public:
-	PowerUp();
+	PowerUp(Player* player);
 	virtual ~PowerUp(void);
 
 	bool CollisionTest(shared_ptr<GameObject> o);
@@ -14,6 +14,7 @@ public:
 
 protected:
 	virtual void ApplyEffect(Spaceship& ship) = 0;
+	Player* mPlayer;
 };
 
 #endif
