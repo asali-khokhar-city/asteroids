@@ -43,6 +43,9 @@ Spaceship::~Spaceship(void)
 /** Update this spaceship. */
 void Spaceship::Update(int t)
 {
+	// Check/update invulnerability
+	CheckInvuln(t);
+
 	// Call parent update function
 	GameObject::Update(t);
 }
@@ -58,6 +61,13 @@ void Spaceship::Render(void)
 	}
 
 	GameObject::Render();
+
+	if (mInvuln && mShieldShape.get() != NULL) {
+		glLineWidth(3.0f);
+		mLogger.debug("Shield is attempting to be rendered.");
+		mShieldShape->Render();
+		glLineWidth(1.0f);
+	}
 }
 
 /** Fire the rockets. */
@@ -116,16 +126,17 @@ void Spaceship::OnCollision(const GameObjectList &objects)
 			// Cast to Asteroid
 			if (Asteroid* asteroid = dynamic_cast<Asteroid*>(o.get())) {
 				if (asteroid->GetSize() == Asteroid::AsteroidSize::SMALL) {
-					// Add collision here?
 					mLogger.debug("Spaceship has collided with small asteroid.");
-					break;
 
 				}
 				else {
-					mLogger.debug("Spaceship has collided with large asteroid.");
-					if (!removed) {
+					if (!removed && !mInvuln) {
 						removed = true;
 						mWorld->FlagForRemoval(GetThisPtr());
+						mLogger.debug("Spaceship has collided with large asteroid.");
+					}
+					else {
+						mLogger.debug("Spaceship has ignored collision with large asteroid.");
 					}
 				}
 			}
@@ -135,4 +146,22 @@ void Spaceship::OnCollision(const GameObjectList &objects)
 
 float Spaceship::GetMaxSpeed() {
 	return mMaxSpeed;
+}
+
+void Spaceship::ActivateInvulnerability(int duration) {
+	mLogger.debug("Spaceship has become invulnerable.");
+	mInvuln = true;
+	mInvulnRemaining = duration;
+}
+
+void Spaceship::CheckInvuln(int t) {
+	if (mInvuln)
+	{
+		mLogger.debug("Spaceship is currently invulnerable.");
+		mInvulnRemaining -= t;
+		if (mInvulnRemaining <= 0) {
+			mLogger.debug("Spaceship is no longer invulnerable.");
+			mInvuln = false;
+		}
+	}
 }

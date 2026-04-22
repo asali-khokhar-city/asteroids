@@ -18,6 +18,7 @@
 #include "ExtraLifePowerUp.h"
 #include "ImageManager.h"
 #include "Image.h"
+#include "InvulnerablePowerUp.h"
 
 // PUBLIC INSTANCE CONSTRUCTORS ///////////////////////////////////////////////
 
@@ -199,7 +200,9 @@ shared_ptr<GameObject> Asteroids::CreateSpaceship()
 	mSpaceship = make_shared<Spaceship>();
 	mSpaceship->SetBoundingShape(make_shared<BoundingSphere>(mSpaceship->GetThisPtr(), 4.0f));
 	shared_ptr<Shape> bullet_shape = make_shared<Shape>("bullet.shape");
+	shared_ptr<Shape> shield_shape = make_shared<Shape>("shield.shape");
 	mSpaceship->SetBulletShape(bullet_shape);
+	mSpaceship->setShieldShape(shield_shape);
 	Animation *anim_ptr = AnimationManager::GetInstance().GetAnimationByName("spaceship");
 	shared_ptr<Sprite> spaceship_sprite =
 		make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
@@ -219,7 +222,7 @@ shared_ptr<GameObject> Asteroids::CreatePowerUp()
 
 	mLogger.debug("Powerup is created/added to game world.");
 
-	shared_ptr<GameObject> p = make_shared<ExtraLifePowerUp>(&mPlayer);
+	shared_ptr<GameObject> p = make_shared<InvulnerablePowerUp>(&mPlayer);
 
 	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("green-heart");
 
