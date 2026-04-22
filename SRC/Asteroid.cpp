@@ -69,6 +69,10 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 				Split(2);
 			}
 
+			if (!mDestroyedByBullet) {
+				mDestroyedByBullet = true;
+			}
+
 			mWorld->FlagForRemoval(GetThisPtr());
 			break;
 		}
@@ -83,9 +87,12 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 					other->SetVelocity(other->ClampSpeed());
 				}
 			}
+
+			//mWorld->FlagForRemoval(GetThisPtr());
+			//break;
 		}
 		else if (typeName.find("PowerUp") != std::string::npos) {
-			mLogger.debug("Collided with power up.");
+			mLogger.debug("Collided with power up: " + typeName);
 		}
 		else {
 			mWorld->FlagForRemoval(GetThisPtr());

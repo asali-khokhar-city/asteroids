@@ -23,15 +23,19 @@ public:
 		if (object->GetType() == GameObjectType("Asteroid")) {
 			Asteroid* asteroid = dynamic_cast<Asteroid*>(object.get());
 			if (asteroid) {
+				if (asteroid->DestroyedByBullet()) {
+					return;
+				}
+
 				if (asteroid->GetSize() == Asteroid::AsteroidSize::BIG) {
 					mScore += 15;
 				}
 				else if (asteroid->GetSize() == Asteroid::AsteroidSize::SMALL) {
 					mScore += 5;
 				}
+
+				FireScoreChanged();
 			}
- 			
-			FireScoreChanged();
 		}
 	}
 

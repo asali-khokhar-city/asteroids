@@ -15,21 +15,21 @@ using namespace std;
 
 /**  Default constructor. */
 Spaceship::Spaceship()
-	: GameObject("Spaceship"), mThrust(0)
+	: GameObject("Spaceship"), mThrusting(false), mBraking(false)
 {
 	SetMaxSpeed(20);
 }
 
 /** Construct a spaceship with given position, velocity, acceleration, angle, and rotation. */
 Spaceship::Spaceship(GLVector3f p, GLVector3f v, GLVector3f a, GLfloat h, GLfloat r)
-	: GameObject("Spaceship", p, v, a, h, r), mThrust(0)
+	: GameObject("Spaceship", p, v, a, h, r), mThrusting(false), mBraking(false)
 {
 	SetMaxSpeed(20);
 }
 
 /** Copy constructor. */
 Spaceship::Spaceship(const Spaceship& s)
-	: GameObject(s), mThrust(0)
+	: GameObject(s), mThrusting(false), mBraking(false)
 {
 	SetMaxSpeed(20);
 }
@@ -47,6 +47,9 @@ void Spaceship::Update(int t)
 	// Check/update invulnerability
 	CheckInvuln(t);
 
+	// Calculate movement
+	CalculateMovement();
+
 	// Call parent update function
 	GameObject::Update(t);
 }
@@ -57,7 +60,7 @@ void Spaceship::Render(void)
 	if (mSpaceshipShape.get() != NULL) mSpaceshipShape->Render();
 
 	// If ship is thrusting
-	if ((mThrust > 0) && (mThrusterShape.get() != NULL)) {
+	if ((mThrusting) && (mThrusterShape.get() != NULL)) {
 		mThrusterShape->Render();
 	}
 
@@ -72,25 +75,34 @@ void Spaceship::Render(void)
 	}
 }
 
-/** Fire the rockets. */
-void Spaceship::Thrust(float t)
+void Spaceship::CalculateMovement()
 {
-	mThrust = t;
-	// Increase acceleration in the direction of ship
-	mAcceleration.x = mThrust*cos(DEG2RAD*mAngle);
-	mAcceleration.y = mThrust*sin(DEG2RAD*mAngle);
+	// Brake
+	if (mBraking) {
+		mVelocity *= BRAKE_FACTOR;
+		SetAcceleration(GLVector3f(0,0,0));
+	}
+
+	// Thrust
+	if (mThrusting) {
+		// Increase acceleration in the direction of ship
+		mAcceleration.x = THRUST_POWER * cos(DEG2RAD * mAngle);
+		mAcceleration.y = THRUST_POWER * sin(DEG2RAD * mAngle);
+	}
 }
 
-/** Cool the jets. */
-void Spaceship::Brake(float factor)
+void Spaceship::Thrust(bool t)
 {
-	// Ensure that factor is between 0 and 1
-	factor = std::clamp(factor, 0.0f, 1.0f);
-	mVelocity *= factor;
+	mThrusting = t;
+}
+
+void Spaceship::Brake(bool b)
+{
+	mBraking = b;
 }
 
 /** Set the rotation. */
-void Spaceship::Rotate(float r)
+void Spaceship::Rotate(float r)	
 {
 	mRotation = r;
 }

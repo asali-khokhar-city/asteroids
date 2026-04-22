@@ -17,8 +17,9 @@ public:
 	virtual void Update(int t);
 	virtual void Render(void);
 
-	virtual void Thrust(float t);
-	virtual void Brake(float t);
+	virtual void CalculateMovement();
+	virtual void Thrust(bool t);
+	virtual void Brake(bool b);
 	virtual void Rotate(float r);
 	virtual void Shoot(void);
 
@@ -35,7 +36,12 @@ public:
 	void ActivateInvulnerability(int duration);
 
 private:
+	const float THRUST_POWER = 10.0f;
+	const float BRAKE_FACTOR = 0.98f;
+
 	float mThrust;
+	bool mThrusting = false;
+	bool mBraking = false;
 	int mInvulnRemaining;
 	bool mInvuln;
 

@@ -20,8 +20,10 @@ public:
 	void OnCollision(const GameObjectList& objects);
 
 	AsteroidSize GetSize();
+	bool DestroyedByBullet() { return mDestroyedByBullet; }
 private:
 	float mMaxSpeed = 10;
+	bool mDestroyedByBullet = false;
 	shared_ptr<Sprite> mSprite;
 
 	AsteroidSize mSize;
