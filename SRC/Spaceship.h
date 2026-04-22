@@ -18,6 +18,7 @@ public:
 	virtual void Render(void);
 
 	virtual void Thrust(float t);
+	virtual void Brake(float t);
 	virtual void Rotate(float r);
 	virtual void Shoot(void);
 

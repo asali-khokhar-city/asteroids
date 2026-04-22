@@ -5,6 +5,7 @@
 #include "BoundingSphere.h"
 #include "Asteroid.h"
 #include "Logger.h"
+#include <algorithm>
 
 Logger Spaceship::mLogger("spaceship.log");
 
@@ -62,6 +63,7 @@ void Spaceship::Render(void)
 
 	GameObject::Render();
 
+	// If ship is invulnerable
 	if (mInvuln && mShieldShape.get() != NULL) {
 		glLineWidth(3.0f);
 		mLogger.debug("Shield is attempting to be rendered.");
@@ -77,6 +79,14 @@ void Spaceship::Thrust(float t)
 	// Increase acceleration in the direction of ship
 	mAcceleration.x = mThrust*cos(DEG2RAD*mAngle);
 	mAcceleration.y = mThrust*sin(DEG2RAD*mAngle);
+}
+
+/** Cool the jets. */
+void Spaceship::Brake(float factor)
+{
+	// Ensure that factor is between 0 and 1
+	factor = std::clamp(factor, 0.0f, 1.0f);
+	mVelocity *= factor;
 }
 
 /** Set the rotation. */

@@ -129,6 +129,8 @@ void Asteroids::OnSpecialKeyPressed(int key, int x, int y)
 	case GLUT_KEY_LEFT: mSpaceship->Rotate(90); break;
 	// If right arrow key is pressed start rotating clockwise
 	case GLUT_KEY_RIGHT: mSpaceship->Rotate(-90); break;
+	// If down arrow key is pressed start braking
+	case GLUT_KEY_DOWN: mSpaceship->Brake(0.9); break;
 	// Default case - do nothing
 	default: break;
 	}
