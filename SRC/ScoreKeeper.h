@@ -8,6 +8,7 @@
 #include "IScoreListener.h"
 #include "IGameWorldListener.h"
 #include "Asteroid.h"
+#include "Spaceship.h"
 
 class ScoreKeeper : public IGameWorldListener
 {
@@ -21,22 +22,24 @@ public:
 	void OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 	{
 		if (object->GetType() == GameObjectType("Asteroid")) {
-			auto asteroid = std::static_pointer_cast<Asteroid>(object);
+			Asteroid* asteroid = dynamic_cast<Asteroid*>(object.get());
 			if (asteroid) {
-				if (asteroid->DestroyedByBullet()) {
-					return;
-				}
-
 				if (asteroid->GetSize() == Asteroid::AsteroidSize::BIG) {
 					mScore += 15;
 				}
 				else if (asteroid->GetSize() == Asteroid::AsteroidSize::SMALL) {
 					mScore += 5;
 				}
-
-				FireScoreChanged();
 			}
 		}
+		else if (object->GetType() == GameObjectType("Spaceship")) {
+			Spaceship* ship = dynamic_cast<Spaceship*>(object.get());
+			if (ship) {
+				mScore -= 15;
+			}
+		}
+
+		FireScoreChanged();
 	}
 
 	void AddListener(shared_ptr<IScoreListener> listener)

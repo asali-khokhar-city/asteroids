@@ -155,7 +155,7 @@ void Spaceship::OnCollision(const GameObjectList &objects)
 					if (!removed && !mInvuln) {
 						removed = true;
 						mWorld->FlagForRemoval(GetThisPtr());
-						mLogger.debug("Spaceship has collided with large asteroid.");
+						mLogger.debug("Spaceship has collided with large asteroid and will be removed.");
 					}
 					else {
 						mLogger.debug("Spaceship has ignored collision with large asteroid.");

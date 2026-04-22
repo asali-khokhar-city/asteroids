@@ -43,7 +43,7 @@ private:
 	bool mThrusting = false;
 	bool mBraking = false;
 	int mInvulnRemaining;
-	bool mInvuln;
+	bool mInvuln = false;
 
 	shared_ptr<Shape> mSpaceshipShape;
 	shared_ptr<Shape> mThrusterShape;
