@@ -21,7 +21,7 @@ public:
 	void OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 	{
 		if (object->GetType() == GameObjectType("Asteroid")) {
-			Asteroid* asteroid = dynamic_cast<Asteroid*>(object.get());
+			auto asteroid = std::static_pointer_cast<Asteroid>(object);
 			if (asteroid) {
 				if (asteroid->DestroyedByBullet()) {
 					return;
