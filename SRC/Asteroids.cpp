@@ -165,11 +165,29 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 {
 	if (object->GetType() == GameObjectType("Asteroid"))
 	{
+		shared_ptr<Asteroid> asteroid = dynamic_pointer_cast<Asteroid>(object);
 		shared_ptr<GameObject> explosion = CreateExplosion();
 		explosion->SetPosition(object->GetPosition());
 		explosion->SetRotation(object->GetRotation());
 		mGameWorld->AddObject(explosion);
+		
+		if (asteroid->GetSize() == Asteroid::AsteroidSize::BIG) {
+			mLogger.debug("Destroying big asteroid.");
+			if (asteroid->DestroyedByBullet()) {
+				for (auto& child : asteroid->Split(2)) {
+					mSpawnQueue.push(child);
+					mLogger.debug("Spawning small asteroid.");
+				}
+			}
+		}
+		else {
+			mLogger.debug("Destroying small asteroid.");
+		}
+		
 		mAsteroidCount--;
+
+		mLogger.debug("Asteroid count: " + std::to_string(mAsteroidCount));
+		
 		if (mAsteroidCount <= 0) 
 		{ 
 			SetTimer(500, START_NEXT_LEVEL); 
@@ -275,7 +293,6 @@ shared_ptr<GameObject> Asteroids::CreatePowerUp()
 void Asteroids::CreateAsteroids(const uint num_asteroids)
 {
 	std::vector<std::string> anims = { "asteroid1", "asteroid2", "asteroid3"};
-	mAsteroidCount = num_asteroids;
 	for (uint i = 0; i < num_asteroids; i++)
 	{
 		std::string anim_name = anims[rand() % anims.size()];
@@ -287,7 +304,28 @@ void Asteroids::CreateAsteroids(const uint num_asteroids)
 		asteroid->SetBoundingShape(make_shared<BoundingSphere>(asteroid->GetThisPtr(), 10.0f));
 		asteroid->SetSprite(asteroid_sprite);
 		asteroid->SetScale(0.2f);
-		mGameWorld->AddObject(asteroid);
+		mSpawnQueue.push(asteroid);
+		//mGameWorld->AddObject(asteroid);
+	}
+}
+
+void Asteroids::SpawnAsteroids()
+{
+	int spawnRate = 0;
+
+	while (spawnRate++ < SPAWN_RATE && !mSpawnQueue.empty() && mAsteroidCount <= MAX_ASTEROIDS)
+	{
+		mAsteroidCount++;
+		auto asteroid = dynamic_pointer_cast<Asteroid>(mSpawnQueue.front());
+		if (asteroid) {
+			mLogger.debug("Spawning asteroid of size: " + std::to_string((int)asteroid->GetSize()));
+		}
+		else {
+			mLogger.debug("Error: Non-asteroid in spawn queue.");
+		}
+		mGameWorld->AddObject(mSpawnQueue.front());
+		mSpawnQueue.pop();
+		mLogger.debug("Asteroid count: " + std::to_string(mAsteroidCount));
 	}
 }
 
@@ -407,6 +445,7 @@ shared_ptr<GameObject> Asteroids::CreateExplosion()
 void Asteroids::OnWorldUpdated(GameWorld* world)
 {
 	UpdateDash();
+	SpawnAsteroids();
 }
 
 

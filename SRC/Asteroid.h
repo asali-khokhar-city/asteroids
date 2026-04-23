@@ -3,6 +3,7 @@
 
 #include "GameObject.h"
 #include "Logger.h"
+#include <vector>
 
 class Asteroid : public GameObject
 {
@@ -19,15 +20,18 @@ public:
 	bool CollisionTest(shared_ptr<GameObject> o);
 	void OnCollision(const GameObjectList& objects);
 
+	std::vector<shared_ptr<Asteroid>> Split(int count);
+
 	AsteroidSize GetSize();
+	bool DestroyedByBullet() { return mDestroyedByBullet; }
 private:
+	bool mDestroyedByBullet = false;
 	float mMaxSpeed = 10;
 	shared_ptr<Sprite> mSprite;
 
 	AsteroidSize mSize;
 
 	void BounceWith(GameObject& other);
-	void Split(int count);
 
 	static Logger mLogger;
 };

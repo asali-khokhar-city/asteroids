@@ -10,6 +10,7 @@
 #include "Player.h"
 #include "IPlayerListener.h"
 #include "Logger.h"
+#include <queue>
 
 class GameObject;
 class Spaceship;
@@ -56,14 +57,19 @@ private:
 	shared_ptr<GUILabel> mGameOverLabel;
 	shared_ptr<GUILabel> mDashLabel;
 
+	// Asteroid spawning
 	uint mLevel;
-	uint mAsteroidCount;
+	uint mAsteroidCount = 0;
+	std::queue<shared_ptr<GameObject>> mSpawnQueue;
+	const int SPAWN_RATE = 1;
+	const int MAX_ASTEROIDS = 50;
 
 	void ResetSpaceship();
 	shared_ptr<GameObject> CreateSpaceship();
 	shared_ptr<GameObject> CreatePowerUp();
 	void CreateGUI();
 	void CreateAsteroids(const uint num_asteroids);
+	void SpawnAsteroids();
 	shared_ptr<GameObject> CreateExplosion();
 	void UpdateDash();
 	

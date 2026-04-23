@@ -66,7 +66,8 @@ void Asteroid::OnCollision(const GameObjectList& objects)
 			// spawn 2 smaller asteroids that do not damage the player
 			mLogger.debug("Asteroid is struck by bullet. Splitting asteroid.");
 			if (mSize == AsteroidSize::BIG) {
-				Split(2);
+				//Split(2);
+				mDestroyedByBullet = true;
 			}
 
 			mWorld->FlagForRemoval(GetThisPtr());
@@ -158,11 +159,13 @@ void Asteroid::BounceWith(GameObject& other) {
 	}
 }
 
-void Asteroid::Split(int count) {
+std::vector<shared_ptr<Asteroid>> Asteroid::Split(int count) {
 	// Only big asteroids should be split
 	if (mSize != AsteroidSize::BIG) {
-		return;
+		return {};
 	}
+
+	std::vector<shared_ptr<Asteroid>> splitChildren;
 
 	// Size coefficient decides how much smaller the asteroid is
 	float sizeCoefficient = 0.2;
@@ -191,6 +194,9 @@ void Asteroid::Split(int count) {
 		// Assign sprite
 		newAsteroid->SetSprite(GetSprite());
 		// Add it to the game world
-		mWorld->AddObject(newAsteroid);
+		//mWorld->AddObject(newAsteroid);
+		splitChildren.push_back(newAsteroid);
 	}
+
+	return splitChildren;
 }
