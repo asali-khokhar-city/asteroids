@@ -18,6 +18,7 @@ Spaceship::Spaceship()
 	: GameObject("Spaceship"), mThrusting(false), mBraking(false)
 {
 	SetMaxSpeed(20);
+	ActivateInvulnerability(2000);
 }
 
 /** Construct a spaceship with given position, velocity, acceleration, angle, and rotation. */
@@ -25,6 +26,7 @@ Spaceship::Spaceship(GLVector3f p, GLVector3f v, GLVector3f a, GLfloat h, GLfloa
 	: GameObject("Spaceship", p, v, a, h, r), mThrusting(false), mBraking(false)
 {
 	SetMaxSpeed(20);
+	ActivateInvulnerability(2000);
 }
 
 /** Copy constructor. */
@@ -32,6 +34,7 @@ Spaceship::Spaceship(const Spaceship& s)
 	: GameObject(s), mThrusting(false), mBraking(false)
 {
 	SetMaxSpeed(20);
+	ActivateInvulnerability(2000);
 }
 
 /** Destructor. */
@@ -45,7 +48,13 @@ Spaceship::~Spaceship(void)
 void Spaceship::Update(int t)
 {
 	// Check/update invulnerability
-	CheckInvuln(t);
+	InvulnTimer(t);
+
+	// Decrement dash
+	DashTimer(t);
+
+	// Decrement dash cooldown
+	DashCooldownTimer(t);
 
 	// Calculate movement
 	CalculateMovement();
@@ -78,7 +87,7 @@ void Spaceship::Render(void)
 void Spaceship::CalculateMovement()
 {
 	// Brake
-	if (mBraking) {
+	if (mBraking && !mDashing) {
 		mVelocity *= BRAKE_FACTOR;
 		SetAcceleration(GLVector3f(0,0,0));
 	}
@@ -88,6 +97,10 @@ void Spaceship::CalculateMovement()
 		// Increase acceleration in the direction of ship
 		mAcceleration.x = THRUST_POWER * cos(DEG2RAD * mAngle);
 		mAcceleration.y = THRUST_POWER * sin(DEG2RAD * mAngle);
+	}
+
+	if (!mDashing) {
+		SetVelocity(ClampSpeed());
 	}
 }
 
@@ -99,6 +112,18 @@ void Spaceship::Thrust(bool t)
 void Spaceship::Brake(bool b)
 {
 	mBraking = b;
+}
+
+void Spaceship::Dash()
+{
+	if (mDashing || mDashCooldown > 0) { return; }
+
+	mVelocity.x += DASH_POWER * cos(DEG2RAD * mAngle);
+	mVelocity.y += DASH_POWER * sin(DEG2RAD * mAngle);
+
+	mDashing = true;
+	mDashRemaining = DASH_TIME;
+	mDashCooldown = DASH_COOLDOWN_TIME;
 }
 
 /** Set the rotation. */
@@ -176,7 +201,7 @@ void Spaceship::ActivateInvulnerability(int duration) {
 	mInvulnRemaining = duration;
 }
 
-void Spaceship::CheckInvuln(int t) {
+void Spaceship::InvulnTimer(int t) {
 	if (mInvuln)
 	{
 		mLogger.debug("Spaceship is currently invulnerable.");
@@ -184,6 +209,26 @@ void Spaceship::CheckInvuln(int t) {
 		if (mInvulnRemaining <= 0) {
 			mLogger.debug("Spaceship is no longer invulnerable.");
 			mInvuln = false;
+		}
+	}
+}
+
+void Spaceship::DashTimer(int t) {
+	if (mDashRemaining > 0)
+	{
+		mDashRemaining -= t;
+		if (mDashRemaining <= 0) {
+			mDashing = false;
+		}
+	}
+}
+
+void Spaceship::DashCooldownTimer(int t) {
+	if (mDashCooldown > 0)
+	{
+		mDashCooldown -= t;
+		if (mDashCooldown <= 0) {
+			mDashCooldown = 0;
 		}
 	}
 }

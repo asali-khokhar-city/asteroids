@@ -20,6 +20,7 @@ public:
 	virtual void CalculateMovement();
 	virtual void Thrust(bool t);
 	virtual void Brake(bool b);
+	virtual void Dash();
 	virtual void Rotate(float r);
 	virtual void Shoot(void);
 
@@ -38,12 +39,18 @@ public:
 private:
 	const float THRUST_POWER = 10.0f;
 	const float BRAKE_FACTOR = 0.98f;
+	const int DASH_TIME = 200;
+	const int DASH_COOLDOWN_TIME = 5000;
+	const float DASH_POWER = 80.0f;
 
 	float mThrust;
-	bool mThrusting = false;
-	bool mBraking = false;
+	bool mThrusting;
+	bool mBraking;
 	int mInvulnRemaining;
 	bool mInvuln = false;
+	int mDashRemaining;
+	int mDashCooldown;
+	bool mDashing = false;
 
 	shared_ptr<Shape> mSpaceshipShape;
 	shared_ptr<Shape> mThrusterShape;
@@ -52,7 +59,9 @@ private:
 
 	static Logger mLogger;
 
-	void Spaceship::CheckInvuln(int t);
+	void InvulnTimer(int t);
+	void DashCooldownTimer(int t);
+	void DashTimer(int t);
 };
 
 #endif

@@ -112,6 +112,9 @@ void Asteroids::OnKeyPressed(uchar key, int x, int y)
 	case ' ':
 		mSpaceship->Shoot();
 		break;
+	case 'x':
+		mSpaceship->Dash();
+		break;
 	default:
 		break;
 	}
