@@ -15,15 +15,16 @@ using namespace std;
 
 /**  Default constructor. */
 Spaceship::Spaceship()
-	: GameObject("Spaceship"), mThrusting(false), mBraking(false)
+	: GameObject("Spaceship"), mThrusting(false), mBraking(false), mDashRemaining(0), mDashCooldown(0)
 {
 	SetMaxSpeed(20);
 	ActivateInvulnerability(2000);
+
 }
 
 /** Construct a spaceship with given position, velocity, acceleration, angle, and rotation. */
 Spaceship::Spaceship(GLVector3f p, GLVector3f v, GLVector3f a, GLfloat h, GLfloat r)
-	: GameObject("Spaceship", p, v, a, h, r), mThrusting(false), mBraking(false)
+	: GameObject("Spaceship", p, v, a, h, r), mThrusting(false), mBraking(false), mDashRemaining(0), mDashCooldown(0)
 {
 	SetMaxSpeed(20);
 	ActivateInvulnerability(2000);
@@ -31,7 +32,7 @@ Spaceship::Spaceship(GLVector3f p, GLVector3f v, GLVector3f a, GLfloat h, GLfloa
 
 /** Copy constructor. */
 Spaceship::Spaceship(const Spaceship& s)
-	: GameObject(s), mThrusting(false), mBraking(false)
+	: GameObject(s), mThrusting(false), mBraking(false), mDashRemaining(0), mDashCooldown(0)
 {
 	SetMaxSpeed(20);
 	ActivateInvulnerability(2000);

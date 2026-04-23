@@ -42,7 +42,7 @@ public:
 
 	// Declaration of IGameWorldListener interface //////////////////////////////
 
-	void OnWorldUpdated(GameWorld* world) {}
+	void OnWorldUpdated(GameWorld* world);
 	void OnObjectAdded(GameWorld* world, shared_ptr<GameObject> object) {}
 	void OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object);
 
@@ -54,6 +54,7 @@ private:
 	shared_ptr<GUILabel> mScoreLabel;
 	shared_ptr<GUILabel> mLivesLabel;
 	shared_ptr<GUILabel> mGameOverLabel;
+	shared_ptr<GUILabel> mDashLabel;
 
 	uint mLevel;
 	uint mAsteroidCount;
@@ -64,6 +65,7 @@ private:
 	void CreateGUI();
 	void CreateAsteroids(const uint num_asteroids);
 	shared_ptr<GameObject> CreateExplosion();
+	void UpdateDash();
 	
 	const static uint SHOW_GAME_OVER = 0;
 	const static uint START_NEXT_LEVEL = 1;

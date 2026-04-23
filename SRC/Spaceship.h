@@ -36,6 +36,9 @@ public:
 
 	void ActivateInvulnerability(int duration);
 
+	bool IsDashing() { return mDashing; }
+	int GetDashCooldownPercent() { return 100.0f - (mDashCooldown / (float)DASH_COOLDOWN_TIME) * 100.0f; }
+
 private:
 	const float THRUST_POWER = 10.0f;
 	const float BRAKE_FACTOR = 0.98f;
@@ -48,8 +51,8 @@ private:
 	bool mBraking;
 	int mInvulnRemaining;
 	bool mInvuln = false;
-	int mDashRemaining;
-	int mDashCooldown;
+	int mDashRemaining = 0;
+	int mDashCooldown = 0;
 	bool mDashing = false;
 
 	shared_ptr<Shape> mSpaceshipShape;

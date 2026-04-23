@@ -304,6 +304,30 @@ void Asteroids::CreateGUI()
 		= static_pointer_cast<GUIComponent>(mGameOverLabel);
 	mGameDisplay->GetContainer()->AddComponent(game_over_component, GLVector2f(0.5f, 0.5f));
 
+	// Create a new GUILabel and wrap it in a shared_ptr
+	mDashLabel = make_shared<GUILabel>("Dash: READY");
+	mDashLabel->SetVerticalAlignment(GUIComponent::GUI_VALIGN_BOTTOM);
+	shared_ptr<GUIComponent> dash_component = static_pointer_cast<GUIComponent>(mDashLabel);
+	mGameDisplay->GetContainer()->AddComponent(dash_component, GLVector2f(0.3f, 0.0f));
+}
+
+void Asteroids::UpdateDash()
+{
+	std::ostringstream msg_stream;
+	msg_stream << "Dash: ";
+
+	if (mSpaceship->IsDashing()) {
+		msg_stream << "DASHING";
+	}
+	else if (mSpaceship->GetDashCooldownPercent() < 100) {
+		msg_stream << mSpaceship->GetDashCooldownPercent() << "% COOLED";
+	}
+	else {
+		msg_stream << "READY";
+	}
+
+	std::string dash_msg = msg_stream.str();
+	mDashLabel->SetText(dash_msg);
 }
 
 void Asteroids::OnScoreChanged(int score)
@@ -355,6 +379,13 @@ shared_ptr<GameObject> Asteroids::CreateExplosion()
 	explosion->SetSprite(explosion_sprite);
 	explosion->Reset();
 	return explosion;
+}
+
+// Declaration of IGameWorldListener interface //////////////////////////////
+
+void Asteroids::OnWorldUpdated(GameWorld* world)
+{
+	UpdateDash();
 }
 
 
