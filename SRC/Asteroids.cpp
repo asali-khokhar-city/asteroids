@@ -74,6 +74,8 @@ void Asteroids::Start()
 	Animation *asteroid3_anim = AnimationManager::GetInstance().CreateAnimationFromFile("asteroid3", 64, 4096, 64, 64, "asteroid3_fs.png");
 	Animation *spaceship_anim = AnimationManager::GetInstance().CreateAnimationFromFile("spaceship", 128, 128, 128, 128, "spaceship_fs.png");	
 	Animation* powerup_img = AnimationManager::GetInstance().CreateAnimationFromFile("green-heart", 64, 64, 64, 64, "green-heart.png");
+	Animation* invuln_powerup_img = AnimationManager::GetInstance().CreateAnimationFromFile("blue-orb", 64, 64, 64, 64, "blue-orb.png");
+	Animation* life_powerup_img = AnimationManager::GetInstance().CreateAnimationFromFile("gear", 64, 64, 64, 64, "gear.png");
 
 	// Create a spaceship and add it to the world
 	mGameWorld->AddObject(CreateSpaceship());
@@ -172,6 +174,19 @@ void Asteroids::OnObjectRemoved(GameWorld* world, shared_ptr<GameObject> object)
 		{ 
 			SetTimer(500, START_NEXT_LEVEL); 
 		}
+
+		// Spawn powerup
+		int roll = rand() % 100; // 0–99
+
+		// 5%
+		if (roll < 5) {
+			shared_ptr<GameObject> powerup = CreatePowerUp();
+
+			// spawn where asteroid died
+			powerup->SetPosition(object->GetPosition());
+
+			mGameWorld->AddObject(powerup);
+		}
 	}
 }
 
@@ -229,25 +244,31 @@ shared_ptr<GameObject> Asteroids::CreatePowerUp()
 
 	mLogger.debug("Powerup is created/added to game world.");
 
-	shared_ptr<GameObject> p = make_shared<InvulnerablePowerUp>(&mPlayer);
+	shared_ptr<GameObject> p;
+	Animation* anim_ptr; 
 
-	Animation* anim_ptr = AnimationManager::GetInstance().GetAnimationByName("green-heart");
+	int type = rand() % 2;
+
+	if (type == 0) {
+		p = make_shared<InvulnerablePowerUp>(&mPlayer);
+		anim_ptr = AnimationManager::GetInstance().GetAnimationByName("blue-orb");
+	}
+	else {
+		p = make_shared<ExtraLifePowerUp>(&mPlayer);
+		anim_ptr = AnimationManager::GetInstance().GetAnimationByName("gear");
+		
+	}	
 
 	shared_ptr<Sprite> powerup_sprite =
 		make_shared<Sprite>(anim_ptr->GetWidth(), anim_ptr->GetHeight(), anim_ptr);
 
-	p->SetSprite(powerup_sprite);
-
 	p->SetScale(0.2f);
+
+	p->SetSprite(powerup_sprite);
 
 	float radius = anim_ptr->GetWidth() * p->GetScale() * 0.3f;
 
 	p->SetBoundingShape(make_shared<BoundingSphere>(p->GetThisPtr(), radius));
-
-	// Ensure powerup is near the middle of the world for testing
-	p->SetPosition(GLVector3f(20, 20, 0));
-
-
 	return p;
 }
 
